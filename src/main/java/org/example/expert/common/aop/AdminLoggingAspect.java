@@ -1,6 +1,7 @@
 package org.example.expert.common.aop;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +69,8 @@ public class AdminLoggingAspect {
             throw e;
         }
 
-        String responseBody = convertObjectToJson(response);
+        String responseString = convertObjectToJson(response);
+        String responseBody = extractBodyFormJson(responseString);
 
         log.info("Response 정보: \nuserId: {}, \ntime: {}, \nURI: {}, \nMethod: {},\nResponseBody: {}",
                 userId,
@@ -109,4 +111,16 @@ public class AdminLoggingAspect {
         }
     }
 
+    private String extractBodyFormJson(String json) {
+        if (json == null || json.isBlank()) return "";
+
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            JsonNode body = root.path("body");
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            log.error("Error extracting body from JSON", e);
+            return "Error extracting body from JSON";
+        }
+    }
 }
