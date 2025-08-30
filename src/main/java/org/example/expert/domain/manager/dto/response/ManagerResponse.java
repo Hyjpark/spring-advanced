@@ -9,8 +9,12 @@ public class ManagerResponse {
     private final Long id;
     private final UserResponse user;
 
-    public ManagerResponse(Long id, UserResponse user) {
+    private ManagerResponse(Long id, UserResponse user) {
         this.id = id;
         this.user = user;
+    }
+
+    public static ManagerResponse of(Long id, UserResponse user) {
+        return new ManagerResponse(id, user);
     }
 }

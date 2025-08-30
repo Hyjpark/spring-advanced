@@ -49,7 +49,7 @@ public class ManagerService {
         Manager newManagerUser = new Manager(managerUser, todo);
         Manager savedManagerUser = managerRepository.save(newManagerUser);
 
-        return new ManagerSaveResponse(
+        return ManagerSaveResponse.of(
                 savedManagerUser.getId(),
                 new UserResponse(managerUser.getId(), managerUser.getEmail())
         );
@@ -65,7 +65,7 @@ public class ManagerService {
         List<ManagerResponse> dtoList = new ArrayList<>();
         for (Manager manager : managerList) {
             User user = manager.getUser();
-            dtoList.add(new ManagerResponse(
+            dtoList.add(ManagerResponse.of(
                     manager.getId(),
                     new UserResponse(user.getId(), user.getEmail())
             ));
