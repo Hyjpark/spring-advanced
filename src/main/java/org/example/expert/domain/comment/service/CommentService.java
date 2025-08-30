@@ -39,7 +39,7 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(newComment);
 
-        return new CommentSaveResponse(
+        return CommentSaveResponse.of(
                 savedComment.getId(),
                 savedComment.getContents(),
                 new UserResponse(user.getId(), user.getEmail())
@@ -53,7 +53,7 @@ public class CommentService {
         List<CommentResponse> dtoList = new ArrayList<>();
         for (Comment comment : commentList) {
             User user = comment.getUser();
-            CommentResponse dto = new CommentResponse(
+            CommentResponse dto = CommentResponse.of(
                     comment.getId(),
                     comment.getContents(),
                     new UserResponse(user.getId(), user.getEmail())
