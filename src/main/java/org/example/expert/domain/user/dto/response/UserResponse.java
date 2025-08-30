@@ -8,8 +8,12 @@ public class UserResponse {
     private final Long id;
     private final String email;
 
-    public UserResponse(Long id, String email) {
+    private UserResponse(Long id, String email) {
         this.id = id;
         this.email = email;
+    }
+
+    public static UserResponse of(Long id, String email) {
+        return new UserResponse(id, email);
     }
 }

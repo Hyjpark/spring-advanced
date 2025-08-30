@@ -51,7 +51,7 @@ public class ManagerService {
 
         return ManagerSaveResponse.of(
                 savedManagerUser.getId(),
-                new UserResponse(managerUser.getId(), managerUser.getEmail())
+                UserResponse.of(managerUser.getId(), managerUser.getEmail())
         );
     }
 
@@ -67,7 +67,7 @@ public class ManagerService {
             User user = manager.getUser();
             dtoList.add(ManagerResponse.of(
                     manager.getId(),
-                    new UserResponse(user.getId(), user.getEmail())
+                    UserResponse.of(user.getId(), user.getEmail())
             ));
         }
         return dtoList;
