@@ -60,7 +60,7 @@ class CommentServiceTest {
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         User user = User.fromAuthUser(authUser);
         Todo todo = Todo.create("title", "title", "contents", user);
-        Comment comment = new Comment(request.getContents(), user, todo);
+        Comment comment = Comment.create(request.getContents(), user, todo);
 
         given(todoRepository.findById(anyLong())).willReturn(Optional.of(todo));
         given(commentRepository.save(any())).willReturn(comment);
