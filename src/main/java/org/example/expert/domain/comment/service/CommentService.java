@@ -31,7 +31,7 @@ public class CommentService {
         Todo todo = todoRepository.findById(todoId).orElseThrow(() ->
                 new InvalidRequestException("Todo not found"));
 
-        Comment newComment = new Comment(
+        Comment newComment = Comment.create(
                 commentSaveRequest.getContents(),
                 user,
                 todo
