@@ -30,7 +30,7 @@ public class TodoService {
 
         String weather = weatherClient.getTodayWeather();
 
-        Todo newTodo = new Todo(
+        Todo newTodo = Todo.create(
                 todoSaveRequest.getTitle(),
                 todoSaveRequest.getContents(),
                 weather,
