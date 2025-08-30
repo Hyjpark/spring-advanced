@@ -43,7 +43,7 @@ public class AuthService {
 
         String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole);
 
-        return new SignupResponse(bearerToken);
+        return SignupResponse.of(bearerToken);
     }
 
     @Transactional(readOnly = true)
@@ -58,6 +58,6 @@ public class AuthService {
 
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
 
-        return new SigninResponse(bearerToken);
+        return SigninResponse.of(bearerToken);
     }
 }
