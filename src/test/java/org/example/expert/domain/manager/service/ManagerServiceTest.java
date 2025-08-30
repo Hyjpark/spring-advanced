@@ -3,6 +3,7 @@ package org.example.expert.domain.manager.service;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.manager.dto.request.ManagerSaveRequest;
+import org.example.expert.domain.manager.dto.response.ManagerQueryDto;
 import org.example.expert.domain.manager.dto.response.ManagerResponse;
 import org.example.expert.domain.manager.dto.response.ManagerSaveResponse;
 import org.example.expert.domain.manager.entity.Manager;
@@ -77,14 +78,10 @@ class ManagerServiceTest {
     public void manager_목록_조회에_성공한다() {
         // given
         long todoId = 1L;
-        User user = User.create("user1@example.com", "password", UserRole.USER);
-        Todo todo = Todo.create("Title", "Contents", "Sunny", user);
-        ReflectionTestUtils.setField(todo, "id", todoId);
+        ManagerQueryDto mockManagerDto = new ManagerQueryDto(1L, 1L, "a@a.com", todoId);
 
-        Manager mockManager = Manager.create(todo.getUser(), todo);
-        List<Manager> managerList = List.of(mockManager);
+        List<ManagerQueryDto> managerList = List.of(mockManagerDto);
 
-        given(todoService.getTodoById(todoId)).willReturn(todo);
         given(managerRepository.findByTodoIdWithUser(todoId)).willReturn(managerList);
 
         // when
@@ -92,8 +89,8 @@ class ManagerServiceTest {
 
         // then
         assertEquals(1, managerResponses.size());
-        assertEquals(mockManager.getId(), managerResponses.get(0).getId());
-        assertEquals(mockManager.getUser().getEmail(), managerResponses.get(0).getUser().getEmail());
+        assertEquals(mockManagerDto.getId(), managerResponses.get(0).getId());
+        assertEquals(mockManagerDto.getUserEmail(), managerResponses.get(0).getUser().getEmail());
     }
 
     @Test // 테스트코드 샘플
