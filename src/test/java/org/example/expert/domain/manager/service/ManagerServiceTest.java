@@ -56,7 +56,7 @@ class ManagerServiceTest {
         long todoId = 1L;
         long managerUserId = 2L;
 
-        Todo todo = new Todo();
+        Todo todo = Todo.create("", "", "", null);
         ReflectionTestUtils.setField(todo, "user", null);
 
         ManagerSaveRequest managerSaveRequest = new ManagerSaveRequest(managerUserId);
@@ -76,7 +76,7 @@ class ManagerServiceTest {
         // given
         long todoId = 1L;
         User user = User.create("user1@example.com", "password", UserRole.USER);
-        Todo todo = new Todo("Title", "Contents", "Sunny", user);
+        Todo todo = Todo.create("Title", "Contents", "Sunny", user);
         ReflectionTestUtils.setField(todo, "id", todoId);
 
         Manager mockManager = new Manager(todo.getUser(), todo);
@@ -101,7 +101,7 @@ class ManagerServiceTest {
         User user = User.fromAuthUser(authUser);  // 일정을 만든 유저
 
         long todoId = 1L;
-        Todo todo = new Todo("Test Title", "Test Contents", "Sunny", user);
+        Todo todo = Todo.create("Test Title", "Test Contents", "Sunny", user);
 
         long managerUserId = 2L;
         User managerUser = User.create("b@b.com", "password", UserRole.USER);  // 매니저로 등록할 유저
