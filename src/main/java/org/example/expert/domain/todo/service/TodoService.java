@@ -81,4 +81,9 @@ public class TodoService {
                 todo.getModifiedAt()
         );
     }
+
+    public Todo getTodoById(Long todoId) {
+        return todoRepository.findById(todoId).orElseThrow(() ->
+                new InvalidRequestException("Todo not found"));
+    }
 }
