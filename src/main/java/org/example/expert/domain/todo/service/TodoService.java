@@ -38,7 +38,7 @@ public class TodoService {
         );
         Todo savedTodo = todoRepository.save(newTodo);
 
-        return new TodoSaveResponse(
+        return TodoSaveResponse.of(
                 savedTodo.getId(),
                 savedTodo.getTitle(),
                 savedTodo.getContents(),
@@ -53,7 +53,7 @@ public class TodoService {
 
         Page<Todo> todos = todoRepository.findAllByOrderByModifiedAtDesc(pageable);
 
-        return todos.map(todo -> new TodoResponse(
+        return todos.map(todo -> TodoResponse.of(
                 todo.getId(),
                 todo.getTitle(),
                 todo.getContents(),
@@ -71,7 +71,7 @@ public class TodoService {
 
         User user = todo.getUser();
 
-        return new TodoResponse(
+        return TodoResponse.of(
                 todo.getId(),
                 todo.getTitle(),
                 todo.getContents(),
