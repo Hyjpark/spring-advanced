@@ -9,6 +9,7 @@ import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.common.exception.ServerException;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.todo.repository.TodoRepository;
+import org.example.expert.domain.todo.service.TodoService;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.enums.UserRole;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class CommentServiceTest {
     @Mock
     private CommentRepository commentRepository;
     @Mock
-    private TodoRepository todoRepository;
+    private TodoService todoService;
     @InjectMocks
     private CommentService commentService;
 
@@ -41,7 +42,7 @@ class CommentServiceTest {
         CommentSaveRequest request = new CommentSaveRequest("contents");
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
 
-        given(todoRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(todoService.getTodoById(anyLong())).willThrow(new InvalidRequestException("Todo not found"));
 
         // when
         InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> {
@@ -62,7 +63,7 @@ class CommentServiceTest {
         Todo todo = Todo.create("title", "title", "contents", user);
         Comment comment = Comment.create(request.getContents(), user, todo);
 
-        given(todoRepository.findById(anyLong())).willReturn(Optional.of(todo));
+        given(todoService.getTodoById(anyLong())).willReturn(todo);
         given(commentRepository.save(any())).willReturn(comment);
 
         // when
