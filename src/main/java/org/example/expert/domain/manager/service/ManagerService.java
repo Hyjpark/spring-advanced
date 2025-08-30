@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.manager.dto.request.ManagerSaveRequest;
+import org.example.expert.domain.manager.dto.response.ManagerQueryDto;
 import org.example.expert.domain.manager.dto.response.ManagerResponse;
 import org.example.expert.domain.manager.dto.response.ManagerSaveResponse;
 import org.example.expert.domain.manager.entity.Manager;
@@ -57,19 +58,13 @@ public class ManagerService {
 
     @Transactional(readOnly = true)
     public List<ManagerResponse> getManagers(long todoId) {
-        Todo todo = todoService.getTodoById(todoId);
+        List<ManagerQueryDto> managerList = managerRepository.findByTodoIdWithUser(todoId);
 
-        List<Manager> managerList = managerRepository.findByTodoIdWithUser(todo.getId());
+        if (managerList.isEmpty()) throw new InvalidRequestException("Todo not found");
 
-        List<ManagerResponse> dtoList = new ArrayList<>();
-        for (Manager manager : managerList) {
-            User user = manager.getUser();
-            dtoList.add(ManagerResponse.of(
-                    manager.getId(),
-                    UserResponse.of(user.getId(), user.getEmail())
-            ));
-        }
-        return dtoList;
+        return managerList.stream()
+                .map(ManagerResponse::of)
+                .toList();
     }
 
     @Transactional

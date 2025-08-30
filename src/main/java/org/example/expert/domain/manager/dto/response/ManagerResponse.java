@@ -14,7 +14,10 @@ public class ManagerResponse {
         this.user = user;
     }
 
-    public static ManagerResponse of(Long id, UserResponse user) {
-        return new ManagerResponse(id, user);
+    public static ManagerResponse of(ManagerQueryDto dto) {
+        return new ManagerResponse(
+                dto.getId(),
+                UserResponse.of(dto.getUserId(), dto.getUserEmail())
+        );
     }
 }
