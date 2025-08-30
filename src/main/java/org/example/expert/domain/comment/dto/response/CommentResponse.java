@@ -16,7 +16,11 @@ public class CommentResponse {
         this.user = user;
     }
 
-    public static CommentResponse of(Long id, String contents, UserResponse user) {
-        return new CommentResponse(id, contents, user);
+    public static CommentResponse of(CommentQueryDto dto) {
+        return new CommentResponse(
+                dto.getId(),
+                dto.getContents(),
+                UserResponse.of(dto.getUserId(), dto.getUserEmail())
+        );
     }
 }
