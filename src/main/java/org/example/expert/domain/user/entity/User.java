@@ -34,7 +34,7 @@ public class User extends Timestamped {
         this.userRole = userRole;
     }
 
-    public static User of(String email, String password, UserRole userRole) {
+    public static User create(String email, String password, UserRole userRole) {
         return new User(email, password, userRole);
     }
 
