@@ -40,7 +40,7 @@ public class Todo extends Timestamped {
         this.contents = contents;
         this.weather = weather;
         this.user = user;
-        this.managers.add(new Manager(user, this));
+        this.managers.add(Manager.create(user, this));
     }
 
     public static Todo create(String title, String contents, String weather, User user) {

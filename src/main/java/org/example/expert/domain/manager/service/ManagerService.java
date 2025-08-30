@@ -46,7 +46,7 @@ public class ManagerService {
             throw new InvalidRequestException("일정 작성자는 본인을 담당자로 등록할 수 없습니다.");
         }
 
-        Manager newManagerUser = new Manager(managerUser, todo);
+        Manager newManagerUser = Manager.create(managerUser, todo);
         Manager savedManagerUser = managerRepository.save(newManagerUser);
 
         return ManagerSaveResponse.of(
