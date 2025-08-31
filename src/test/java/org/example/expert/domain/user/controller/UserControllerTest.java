@@ -44,7 +44,7 @@ public class UserControllerTest {
         long userId = 1L;
         String email = "asd@asd.com";
         UserResponse userResponse = UserResponse.of(userId, email);
-        given(userService.getUser(userId)).willReturn(userResponse);
+        given(userService.getUser(anyLong())).willReturn(userResponse);
 
         // when * then
         mockMvc.perform(get("/users/{userId}", userId))
@@ -63,7 +63,7 @@ public class UserControllerTest {
         given(authUserArgumentResolver.resolveArgument(
                 any(), any(), any(), any()))
                 .willReturn(new AuthUser(userId, "asd@asd.com", UserRole.USER));
-        doNothing().when(userService).changePassword(eq(userId), any(UserChangePasswordRequest.class));
+        doNothing().when(userService).changePassword(anyLong(), any(UserChangePasswordRequest.class));
 
         // when * then
         mockMvc.perform(put("/users")
