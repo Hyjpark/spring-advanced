@@ -22,8 +22,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -76,4 +76,16 @@ public class ManagerControllerTest {
                 .andExpect(jsonPath("$[1].id").value(managerResponseList.get(1).getId()));
     }
 
+    @Test
+    public void Manager_삭제_성공() throws Exception {
+        // given
+        long todoId = 1L;
+        long managerId = 2L;
+
+        doNothing().when(managerService).deleteManager(any(AuthUser.class), anyLong(), anyLong());
+
+        // when & then
+        mockMvc.perform(delete("/todos/{todoId}/managers/{managerId}", todoId, managerId))
+                .andExpect(status().isOk());
+    }
 }
