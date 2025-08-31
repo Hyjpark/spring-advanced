@@ -35,8 +35,4 @@ public class Comment extends Timestamped {
     public static Comment create(String contents, User user, Todo todo) {
         return new Comment(contents, user, todo);
     }
-
-    public void update(String contents) {
-        this.contents = contents;
-    }
 }
