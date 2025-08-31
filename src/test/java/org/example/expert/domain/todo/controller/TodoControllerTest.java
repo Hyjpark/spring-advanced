@@ -8,8 +8,6 @@ import org.example.expert.domain.todo.dto.response.TodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
 import org.example.expert.domain.todo.service.TodoService;
 import org.example.expert.domain.user.dto.response.UserResponse;
-import org.example.expert.domain.user.entity.User;
-import org.example.expert.domain.user.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,8 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -91,5 +89,20 @@ public class TodoControllerTest {
                 .andExpect(jsonPath("$.content[0].title").value(todo1.getTitle()))
                 .andExpect(jsonPath("$.content[1].id").value(todo2.getId()))
                 .andExpect(jsonPath("$.content[1].title").value(todo2.getTitle()));
+    }
+
+    @Test
+    public void Todo_단건_조회_성공() throws Exception{
+        // given
+        long todoId = 1L;
+        UserResponse userResponse = UserResponse.of(1L, "asd@asd.com");
+        TodoResponse todoResponse = TodoResponse.of(1L, "title", "contents", "Sunny", userResponse, LocalDateTime.now(), LocalDateTime.now());
+
+        given(todoService.getTodo(anyLong())).willReturn(todoResponse);
+
+        /// when * then
+        mockMvc.perform(get("/todos/{todoId}", todoId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(todoId));
     }
 }
