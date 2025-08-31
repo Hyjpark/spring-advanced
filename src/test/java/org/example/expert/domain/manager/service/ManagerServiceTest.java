@@ -96,8 +96,8 @@ class ManagerServiceTest {
         assertEquals(mockManagerDto.getUserEmail(), managerResponses.get(0).getUser().getEmail());
     }
 
-    @Test // 테스트코드 샘플
-    void todo가_정상적으로_등록된다() {
+    @Test
+    public void manager가_정상적으로_등록된다() {
         // given
         AuthUser authUser = new AuthUser(1L, "a@a.com", UserRole.USER);
         User user = User.fromAuthUser(authUser);  // 일정을 만든 유저
