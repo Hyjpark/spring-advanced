@@ -2,6 +2,7 @@ package org.example.expert.domain.todo.service;
 
 import org.example.expert.client.WeatherClient;
 import org.example.expert.domain.common.dto.AuthUser;
+import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.todo.dto.request.TodoSaveRequest;
 import org.example.expert.domain.todo.dto.response.TodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
@@ -26,8 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -155,5 +155,42 @@ public class TodoServiceTest {
         assertEquals(user.getEmail(), todoResponse.getUser().getEmail());
         assertNotNull(todoResponse.getCreatedAt());
         assertNotNull(todoResponse.getModifiedAt());
+    }
+
+    @Test
+    public void 존재하는_todoId로_조회하면_Todo를_반환한다() {
+        // given
+        long todoId = 1L;
+        User user = User.create("asd@asd.com", "pass", UserRole.USER);
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        Todo todo = Todo.create("title", "contents", "Sunny", user);
+        ReflectionTestUtils.setField(todo, "id", todoId);
+
+        given(todoRepository.findById(todoId)).willReturn(Optional.of(todo));
+
+        // when
+        Todo response = todoService.getTodoById(todoId);
+
+        // then
+        assertNotNull(response);
+        assertEquals(response.getId(), todoId);
+        assertEquals(response.getTitle(), todo.getTitle());
+        assertEquals(response.getContents(), todo.getContents());
+        assertEquals(response.getWeather(), todo.getWeather());
+        assertEquals(response.getUser().getId(), user.getId());
+    }
+
+    @Test
+    public void 존재하지_않는_todoId로_조회하면_InvalidRequestException을_던진다() {
+        // given
+        long todoId = 1L;
+        given(todoRepository.findById(todoId)).willReturn(Optional.empty());
+
+        // when & then
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                () -> todoService.getTodoById(todoId));
+
+        assertEquals("Todo not found", exception.getMessage());
     }
 }
