@@ -5,6 +5,8 @@ import org.example.expert.config.AuthUserArgumentResolver;
 import org.example.expert.config.JwtUtil;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.manager.dto.request.ManagerSaveRequest;
+import org.example.expert.domain.manager.dto.response.ManagerQueryDto;
+import org.example.expert.domain.manager.dto.response.ManagerResponse;
 import org.example.expert.domain.manager.dto.response.ManagerSaveResponse;
 import org.example.expert.domain.manager.service.ManagerService;
 import org.example.expert.domain.user.dto.response.UserResponse;
@@ -16,8 +18,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,6 +56,24 @@ public class ManagerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(managerSaveRequest)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void Manager_목록_조회_성공() throws Exception {
+        // given
+        long todoId = 1L;
+        List<ManagerResponse> managerResponseList = List.of(
+                ManagerResponse.of(new ManagerQueryDto(1L, 1L, "asd@asd.com", todoId)),
+                ManagerResponse.of(new ManagerQueryDto(2L, 2L, "qwer@qwer.com", todoId))
+        );
+        given(managerService.getManagers(anyLong())).willReturn(managerResponseList);
+
+        // when & then
+        mockMvc.perform(get("/todos/{todoId}/managers", todoId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(managerResponseList.size()))
+                .andExpect(jsonPath("$[0].id").value(managerResponseList.get(0).getId()))
+                .andExpect(jsonPath("$[1].id").value(managerResponseList.get(1).getId()));
     }
 
 }
