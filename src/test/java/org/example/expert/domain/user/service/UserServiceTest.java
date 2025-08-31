@@ -107,7 +107,7 @@ public class UserServiceTest {
         // 새 비밀번호가 기존과 같음
         given(passwordEncoder.matches(oldPassword, user.getPassword())).willReturn(true);
 
-        // when
+        // when & then
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,
                 () -> userService.changePassword(userId, userChangePasswordRequest));
 
