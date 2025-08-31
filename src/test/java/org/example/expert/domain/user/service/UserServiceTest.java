@@ -1,6 +1,9 @@
 package org.example.expert.domain.user.service;
 
+import org.example.expert.config.PasswordEncoder;
+import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
+import org.example.expert.domain.user.dto.request.UserChangePasswordRequest;
 import org.example.expert.domain.user.dto.response.UserResponse;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.enums.UserRole;
@@ -16,7 +19,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,6 +27,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -58,5 +64,75 @@ public class UserServiceTest {
                 () -> userService.getUser(userId),
                 "User not found"
         );
+    }
+
+    @Test
+    public void 비밀번호를_정상적으로_변경한다() {
+        // given
+        long userId = 1L;
+        String oldPassword = "oldPassword";
+        String newPassword = "newPassword";
+
+        User user = User.create("asd@asd.com", oldPassword, UserRole.USER);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        UserChangePasswordRequest userChangePasswordRequest = new UserChangePasswordRequest(oldPassword, newPassword);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(newPassword, user.getPassword())).willReturn(false);
+        given(passwordEncoder.matches(oldPassword, user.getPassword())).willReturn(true);
+        given(passwordEncoder.encode(newPassword)).willReturn("encodedNewPass");
+
+        // when
+        userService.changePassword(userId, userChangePasswordRequest);
+
+        // then
+        assertEquals(user.getPassword(), "encodedNewPass");
+    }
+
+    @Test
+    public void 새_비밀번호가_기존_비밀번호와_같으면_InvalidRequestException을_던진다() {
+        // given
+        long userId = 1L;
+        String oldPassword = "password";
+        String newPassword = oldPassword;
+
+        User user = User.create("asd@asd.com", oldPassword, UserRole.USER);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        UserChangePasswordRequest userChangePasswordRequest = new UserChangePasswordRequest(oldPassword, newPassword);
+
+        // user가 존재함
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        // 새 비밀번호가 기존과 같음
+        given(passwordEncoder.matches(oldPassword, user.getPassword())).willReturn(true);
+
+        // when
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                () -> userService.changePassword(userId, userChangePasswordRequest));
+
+        assertEquals("새 비밀번호는 기존 비밀번호와 같을 수 없습니다.", exception.getMessage());
+    }
+
+    @Test
+    public void 기존_비밀번호가_틀리면_InvalidRequestException을_던진다() {
+        // given
+        long userId = 1L;
+        String oldPassword = "password";
+        String newPassword = "newPassword";
+
+        User user = User.create("asd@asd.com", "pass", UserRole.USER);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        UserChangePasswordRequest userChangePasswordRequest = new UserChangePasswordRequest(oldPassword, newPassword);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(anyString(), eq(user.getPassword()))).willReturn(false);
+
+        // when & then
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                () -> userService.changePassword(userId, userChangePasswordRequest));
+
+        assertEquals("잘못된 비밀번호입니다.", exception.getMessage());
     }
 }
