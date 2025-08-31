@@ -64,11 +64,11 @@ public class TodoServiceTest {
 
         // then
         assertNotNull(todoSaveResponse);
-        assertEquals(todoSaveRequest.getTitle(), todoSaveResponse.getTitle());
-        assertEquals(todoSaveRequest.getContents(), todoSaveResponse.getContents());
-        assertEquals(weather, todoSaveResponse.getWeather());
-        assertEquals(user.getId(), todoSaveResponse.getUser().getId());
-        assertEquals(user.getEmail(), todoSaveResponse.getUser().getEmail());
+        assertEquals(todoSaveRequest.getTitle(), todo.getTitle());
+        assertEquals(todoSaveRequest.getContents(), todo.getContents());
+        assertEquals(todoSaveResponse.getWeather(), todo.getWeather());
+        assertEquals(todoSaveResponse.getUser().getId(), todo.getUser().getId());
+        assertEquals(todoSaveResponse.getUser().getEmail(), todo.getUser().getEmail());
     }
 
     @Test
