@@ -3,9 +3,11 @@ package org.example.expert.domain.todo.service;
 import org.example.expert.client.WeatherClient;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.todo.dto.request.TodoSaveRequest;
+import org.example.expert.domain.todo.dto.response.TodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.todo.repository.TodoRepository;
+import org.example.expert.domain.user.dto.response.UserResponse;
 import org.example.expert.domain.user.entity.User;
 import org.example.expert.domain.user.enums.UserRole;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,5 +66,60 @@ public class TodoServiceTest {
         assertEquals(weather, todoSaveResponse.getWeather());
         assertEquals(user.getId(), todoSaveResponse.getUser().getId());
         assertEquals(user.getEmail(), todoSaveResponse.getUser().getEmail());
+    }
+
+    @Test
+    public void 존재하는_Todos를_조회하면_Page로_반환된다() {
+        // given
+        int page = 1;
+        int size = 10;
+
+        User user = User.create("asd@asd.com", "pass", UserRole.USER);
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        Todo todo1 = Todo.create("title1", "contents1", "Sunny", user);
+        ReflectionTestUtils.setField(todo1, "id", 1L);
+
+        Todo todo2 = Todo.create("title2", "contents2", "Sunny", user);
+        ReflectionTestUtils.setField(todo2, "id", 2L);
+
+        List<Todo> todos = List.of(todo1, todo2);
+        Pageable pageable = PageRequest.of(page - 1, size);
+        PageImpl<Todo> todoPage = new PageImpl<>(todos, pageable, todos.size());
+
+        given(todoRepository.findAllByOrderByModifiedAtDesc(any(Pageable.class))).willReturn(todoPage);
+
+        // when
+        Page<TodoResponse> todoResponses = todoService.getTodos(page, size);
+
+        // then
+        assertNotNull(todoResponses);
+        assertThat(todoResponses.getTotalElements()).isEqualTo(todoPage.getTotalElements());
+
+        List<TodoResponse> expectedResponses = List.of(
+                TodoResponse.of(
+                        todo1.getId(),
+                        todo1.getTitle(),
+                        todo1.getContents(),
+                        todo1.getWeather(),
+                        UserResponse.of(user.getId(), user.getEmail()),
+                        todo1.getCreatedAt(),
+                        todo1.getModifiedAt()
+                ),
+                TodoResponse.of(
+                        todo2.getId(),
+                        todo2.getTitle(),
+                        todo2.getContents(),
+                        todo2.getWeather(),
+                        UserResponse.of(user.getId(), user.getEmail()),
+                        todo2.getCreatedAt(),
+                        todo2.getModifiedAt()
+                )
+        );
+
+        // 전체 리스트를 한 번에 비교
+        assertThat(todoResponses.getContent())
+                .usingRecursiveComparison()
+                .isEqualTo(expectedResponses);
     }
 }
