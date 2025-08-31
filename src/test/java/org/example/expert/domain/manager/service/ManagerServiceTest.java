@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -122,5 +123,52 @@ class ManagerServiceTest {
         assertNotNull(response);
         assertEquals(managerUser.getId(), response.getUser().getId());
         assertEquals(managerUser.getEmail(), response.getUser().getEmail());
+    }
+
+    @Test
+    public void 일정_작성자가_아닌_유저가_매니저를_등록하면_InvalidRequestException_을_던진다() {
+        // given
+        AuthUser authUser = new AuthUser(1L, "asd@asd.com", UserRole.USER);
+        long todoId = 1L;
+        long managerUserId = 2L;
+
+        User otherUser = User.create("qwer@qwer.com", "pass", UserRole.USER);
+
+        Todo todo = Todo.create("title", "contents", "Sunny", otherUser);
+
+        ManagerSaveRequest managerSaveRequest = new ManagerSaveRequest(managerUserId);
+
+        given(todoService.getTodoById(todoId)).willReturn(todo);
+
+        // when & then
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class, () ->
+                managerService.saveManager(authUser, todoId, managerSaveRequest)
+        );
+
+        assertEquals("일정을 생성한 유저만 담당자를 지정할 수 있습니다.", exception.getMessage());
+    }
+
+    @Test
+    public void 일정_작성자가_본인을_매니저로_등록하면_InvalidRequestException_을_던진다() {
+        // given
+        AuthUser authUser = new AuthUser(1L, "asd@asd.com", UserRole.USER);
+        long todoId = 1L;
+        long managerUserId = 2L;
+
+        User user = User.fromAuthUser(authUser);
+
+        Todo todo = Todo.create("title", "contents", "Sunny", user);
+
+        ManagerSaveRequest managerSaveRequest = new ManagerSaveRequest(managerUserId);
+
+        given(todoService.getTodoById(todoId)).willReturn(todo);
+        given(userService.getManagerUserById(managerUserId)).willReturn(user);
+
+        // when & then
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class, () ->
+                managerService.saveManager(authUser, todoId, managerSaveRequest)
+        );
+
+        assertEquals("일정 작성자는 본인을 담당자로 등록할 수 없습니다.", exception.getMessage());
     }
 }
