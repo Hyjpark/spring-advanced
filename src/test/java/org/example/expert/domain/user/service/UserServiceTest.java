@@ -135,4 +135,34 @@ public class UserServiceTest {
 
         assertEquals("잘못된 비밀번호입니다.", exception.getMessage());
     }
+
+    @Test
+    public void 존재하는_managerUserId로_조회하면_User를_반환한다() {
+        // given
+        long managerUserId = 1L;
+        User user = User.create("asd@asd.com", "password", UserRole.USER);
+        ReflectionTestUtils.setField(user, "id", managerUserId);
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+
+        // when
+        User managerUser = userService.getManagerUserById(managerUserId);
+
+        // Then
+        assertThat(managerUser).isNotNull();
+        assertEquals(managerUser.getId(), user.getId());
+    }
+
+    @Test
+    public void 존재하지_않는_managerUserId로_조회하면_InvalidRequestException을_던진다() {
+        // given
+        long managerUserId = 1L;
+        given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        // when & then
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                () -> userService.getManagerUserById(managerUserId));
+
+        assertEquals("등록하려고 하는 담당자 유저가 존재하지 않습니다.", exception.getMessage());
+    }
 }
