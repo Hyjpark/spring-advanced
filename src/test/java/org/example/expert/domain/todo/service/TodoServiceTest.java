@@ -21,12 +21,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -121,5 +124,36 @@ public class TodoServiceTest {
         assertThat(todoResponses.getContent())
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponses);
+    }
+
+
+    @Test
+    public void 존재하는_todoId로_조회하면_TodoResponse를_반환한다() {
+        // given
+        long todoId = 1L;
+
+        User user = User.create("asd@asd.com", "pass", UserRole.USER);
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        Todo todo = Todo.create("title", "contents", "Sunny", user);
+        ReflectionTestUtils.setField(todo, "id", todoId);
+        ReflectionTestUtils.setField(todo, "createdAt", LocalDateTime.now());
+        ReflectionTestUtils.setField(todo, "modifiedAt", LocalDateTime.now());
+
+        given(todoRepository.findByIdWithUser(anyLong())).willReturn(Optional.of(todo));
+
+        // when
+        TodoResponse todoResponse = todoService.getTodo(todoId);
+
+        // then
+        assertNotNull(todoResponse);
+        assertEquals(todo.getId(), todoResponse.getId());
+        assertEquals(todo.getTitle(), todoResponse.getTitle());
+        assertEquals(todo.getContents(), todoResponse.getContents());
+        assertEquals(todo.getWeather(), todoResponse.getWeather());
+        assertEquals(user.getId(), todoResponse.getUser().getId());
+        assertEquals(user.getEmail(), todoResponse.getUser().getEmail());
+        assertNotNull(todoResponse.getCreatedAt());
+        assertNotNull(todoResponse.getModifiedAt());
     }
 }
