@@ -39,11 +39,6 @@ public class UserService {
         user.changePassword(passwordEncoder.encode(userChangePasswordRequest.getNewPassword()));
     }
 
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()
-                -> new InvalidRequestException("User not found"));
-    }
-
     public User getManagerUserById(Long managerUserId) {
         return userRepository.findById(managerUserId).orElseThrow(()
                 -> new InvalidRequestException("등록하려고 하는 담당자 유저가 존재하지 않습니다."));

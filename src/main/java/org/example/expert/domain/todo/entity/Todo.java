@@ -47,8 +47,4 @@ public class Todo extends Timestamped {
         return new Todo(title, contents, weather, user);
     }
 
-    public void update(String title, String contents) {
-        this.title = title;
-        this.contents = contents;
-    }
 }
