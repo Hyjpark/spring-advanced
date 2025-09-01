@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Table(name = "todos")
+@NamedEntityGraph(name = "Todo.withUser", attributeNodes = @NamedAttributeNode("user"))
 public class Todo extends Timestamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
