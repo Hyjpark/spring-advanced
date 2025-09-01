@@ -1,2 +1,2 @@
 # 테스트 커버리지
-<img width="870" height="221" alt="image" src="https://github.com/user-attachments/assets/a662599b-c445-44ab-94ee-b2931d8cd8d8" />
+<img width="777" height="220" alt="image" src="https://github.com/user-attachments/assets/798636b2-8619-4560-b49c-91f90df1b4e4" />
