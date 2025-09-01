@@ -7,7 +7,11 @@ public class SigninResponse {
 
     private final String bearerToken;
 
-    public SigninResponse(String bearerToken) {
+    private SigninResponse(String bearerToken) {
         this.bearerToken = bearerToken;
+    }
+
+    public static SigninResponse of(String bearerToken) {
+        return new SigninResponse(bearerToken);
     }
 }

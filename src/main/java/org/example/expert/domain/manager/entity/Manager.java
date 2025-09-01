@@ -1,6 +1,7 @@
 package org.example.expert.domain.manager.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.expert.domain.todo.entity.Todo;
@@ -8,7 +9,7 @@ import org.example.expert.domain.user.entity.User;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "managers")
 public class Manager {
 
@@ -22,8 +23,12 @@ public class Manager {
     @JoinColumn(name = "todo_id", nullable = false)
     private Todo todo;
 
-    public Manager(User user, Todo todo) {
+    private Manager(User user, Todo todo) {
         this.user = user;
         this.todo = todo;
+    }
+
+    public static Manager create(User user, Todo todo) {
+        return new Manager(user, todo);
     }
 }
