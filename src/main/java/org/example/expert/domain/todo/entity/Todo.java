@@ -1,6 +1,7 @@
 package org.example.expert.domain.todo.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.expert.domain.comment.entity.Comment;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "todos")
 @NamedEntityGraph(name = "Todo.withUser", attributeNodes = @NamedAttributeNode("user"))
 public class Todo extends Timestamped {
@@ -34,12 +35,16 @@ public class Todo extends Timestamped {
     @OneToMany(mappedBy = "todo", cascade = CascadeType.PERSIST)
     private List<Manager> managers = new ArrayList<>();
 
-    public Todo(String title, String contents, String weather, User user) {
+    private Todo(String title, String contents, String weather, User user) {
         this.title = title;
         this.contents = contents;
         this.weather = weather;
         this.user = user;
-        this.managers.add(new Manager(user, this));
+        this.managers.add(Manager.create(user, this));
+    }
+
+    public static Todo create(String title, String contents, String weather, User user) {
+        return new Todo(title, contents, weather, user);
     }
 
     public void update(String title, String contents) {

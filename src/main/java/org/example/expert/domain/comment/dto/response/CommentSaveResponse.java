@@ -10,9 +10,13 @@ public class CommentSaveResponse {
     private final String contents;
     private final UserResponse user;
 
-    public CommentSaveResponse(Long id, String contents, UserResponse user) {
+    private CommentSaveResponse(Long id, String contents, UserResponse user) {
         this.id = id;
         this.contents = contents;
         this.user = user;
+    }
+
+    public static CommentSaveResponse of(Long id, String contents, UserResponse user) {
+        return new CommentSaveResponse(id, contents, user);
     }
 }

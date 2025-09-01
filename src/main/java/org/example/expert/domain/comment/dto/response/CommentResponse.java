@@ -10,9 +10,17 @@ public class CommentResponse {
     private final String contents;
     private final UserResponse user;
 
-    public CommentResponse(Long id, String contents, UserResponse user) {
+    private CommentResponse(Long id, String contents, UserResponse user) {
         this.id = id;
         this.contents = contents;
         this.user = user;
+    }
+
+    public static CommentResponse of(CommentQueryDto dto) {
+        return new CommentResponse(
+                dto.getId(),
+                dto.getContents(),
+                UserResponse.of(dto.getUserId(), dto.getUserEmail())
+        );
     }
 }

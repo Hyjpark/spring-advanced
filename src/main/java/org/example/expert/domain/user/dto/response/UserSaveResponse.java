@@ -7,7 +7,11 @@ public class UserSaveResponse {
 
     private final String bearerToken;
 
-    public UserSaveResponse(String bearerToken) {
+    private UserSaveResponse(String bearerToken) {
         this.bearerToken = bearerToken;
+    }
+
+    public static UserSaveResponse of(String bearerToken) {
+        return new UserSaveResponse(bearerToken);
     }
 }
